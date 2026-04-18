@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark background -->
+  <rect width="32" height="32" rx="6" fill="#0d1117"/>
+  <!-- Cyan border -->
+  <rect width="32" height="32" rx="6" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+  <!-- Hammer head -->
+  <rect x="7" y="7" width="13" height="7" rx="1.5" fill="#00d4ff"/>
+  <!-- Hammer handle -->
+  <rect x="17" y="12" width="4" height="14" rx="1.5" fill="#00d4ff" transform="rotate(45 19 16)"/>
+  <!-- Strike sparks -->
+  <circle cx="9" cy="22" r="1.2" fill="#00d4ff" opacity="0.6"/>
+  <circle cx="6" cy="19" r="0.8" fill="#00d4ff" opacity="0.4"/>
+  <circle cx="12" cy="24" r="0.7" fill="#00d4ff" opacity="0.5"/>
+</svg>
