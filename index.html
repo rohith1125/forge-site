@@ -488,6 +488,55 @@
     footer a { color: var(--text-dim); }
     footer a:hover { color: var(--cyan); }
 
+    /* ── Download grid ── */
+    .dl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .dl-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      transition: border-color 0.15s, transform 0.12s;
+      text-decoration: none !important;
+    }
+
+    .dl-btn:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .dl-icon {
+      font-size: 1.2rem;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .dl-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .dl-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .dl-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
     /* ── Install steps ── */
     .install-steps { display: flex; flex-direction: column; gap: 1.5rem; }
 
@@ -775,10 +824,46 @@
     <h2>Installation guide</h2>
     <p class="section-sub">Single binary — no Node.js, no npm, no dependencies. Download, make executable, set your API key, run.</p>
 
+    <!-- Direct download buttons -->
+    <div class="dl-grid">
+      <a class="dl-btn" href="https://github.com/rohith1125/forge-releases/releases/latest/download/forge-mac-arm64" download>
+        <span class="dl-icon">⬇</span>
+        <span class="dl-info">
+          <span class="dl-name">macOS Apple Silicon</span>
+          <span class="dl-sub">M1 / M2 / M3 / M4</span>
+        </span>
+      </a>
+      <a class="dl-btn" href="https://github.com/rohith1125/forge-releases/releases/latest/download/forge-mac-x64" download>
+        <span class="dl-icon">⬇</span>
+        <span class="dl-info">
+          <span class="dl-name">macOS Intel</span>
+          <span class="dl-sub">x86_64</span>
+        </span>
+      </a>
+      <a class="dl-btn" href="https://github.com/rohith1125/forge-releases/releases/latest/download/forge-linux-x64" download>
+        <span class="dl-icon">⬇</span>
+        <span class="dl-info">
+          <span class="dl-name">Linux</span>
+          <span class="dl-sub">x64 · Ubuntu / Debian / Arch</span>
+        </span>
+      </a>
+      <a class="dl-btn" href="https://github.com/rohith1125/forge-releases/releases/latest/download/forge-windows-x64.exe" download>
+        <span class="dl-icon">⬇</span>
+        <span class="dl-info">
+          <span class="dl-name">Windows</span>
+          <span class="dl-sub">x64 · .exe</span>
+        </span>
+      </a>
+    </div>
+    <div style="margin-bottom:1.5rem; font-size:0.8rem; color:var(--text-muted); text-align:center;">
+      All releases → <a href="https://github.com/rohith1125/forge-releases/releases" target="_blank" style="color:var(--cyan)">github.com/rohith1125/forge-releases</a>
+    </div>
+
     <div class="tabs">
       <div class="tab active" onclick="switchTab('mac-arm')">macOS Apple Silicon</div>
       <div class="tab" onclick="switchTab('mac-x64')">macOS Intel</div>
       <div class="tab" onclick="switchTab('linux')">Linux</div>
+      <div class="tab" onclick="switchTab('windows')">Windows</div>
     </div>
 
     <!-- ── macOS ARM ── -->
@@ -990,6 +1075,68 @@
               <pre id="linux-run"><span class="cmd">forge</span></pre>
             </div>
             <p class="install-note">Tested on Ubuntu 22.04+, Debian 12+, Arch Linux. Requires a real terminal (not a VS Code integrated terminal inside a container).</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Windows ── -->
+    <div class="tab-content" id="tab-windows">
+      <div class="install-steps">
+
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Download the binary</div>
+            <p class="step-desc">Click the download button above, or run this in PowerShell:</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('win-dl')">copy</button>
+              <pre id="win-dl"><span class="cmd">Invoke-WebRequest</span> <span class="arg">-Uri</span> <span class="str">https://github.com/rohith1125/forge-releases/releases/latest/download/forge-windows-x64.exe</span> <span class="arg">-OutFile</span> <span class="str">forge.exe</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Add to PATH</div>
+            <p class="step-desc">Move the binary somewhere on your PATH, or add its location to PATH. In PowerShell (run as Administrator):</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('win-path')">copy</button>
+              <pre id="win-path"><span class="comment"># Move to a permanent location</span>
+<span class="cmd">Move-Item</span> <span class="str">forge.exe</span> <span class="arg">C:\Windows\System32\forge.exe</span></pre>
+            </div>
+            <p class="install-note">Or move to any folder already in your PATH, e.g. <code>C:\Users\YOU\bin\</code></p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Set your API key</div>
+            <p class="step-desc">Set the environment variable permanently via System Settings, or per-session in PowerShell:</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('win-key')">copy</button>
+              <pre id="win-key"><span class="comment"># Permanent (System Environment Variables)</span>
+<span class="cmd">[System.Environment]::SetEnvironmentVariable</span>(<span class="str">"ANTHROPIC_API_KEY"</span>, <span class="str">"sk-ant-YOUR-KEY"</span>, <span class="str">"User"</span>)
+
+<span class="comment"># OR just this session</span>
+<span class="cmd">$env:ANTHROPIC_API_KEY</span> = <span class="str">"sk-ant-YOUR-KEY"</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Launch forge</div>
+            <p class="step-desc">Open a new terminal (Windows Terminal recommended) and run:</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('win-run')">copy</button>
+              <pre id="win-run"><span class="cmd">forge</span></pre>
+            </div>
+            <p class="install-note">Requires Windows Terminal or PowerShell 7+. Does not work in CMD.exe or old PowerShell 5.</p>
           </div>
         </div>
 
