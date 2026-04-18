@@ -488,6 +488,120 @@
     footer a { color: var(--text-dim); }
     footer a:hover { color: var(--cyan); }
 
+    /* ── Install steps ── */
+    .install-steps { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .install-step {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: rgba(0,212,255,0.12);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-top: 2px;
+    }
+
+    .step-body { flex: 1; min-width: 0; }
+
+    .step-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .step-badge {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+    }
+
+    .step-badge.warning {
+      background: rgba(210,153,34,0.15);
+      border: 1px solid rgba(210,153,34,0.3);
+      color: var(--yellow);
+    }
+
+    .step-desc {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .provider-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .provider-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .provider-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .provider-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+
+    .provider-steps {
+      padding-left: 1.2rem;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    .provider-steps li strong { color: var(--text); }
+
+    /* ── FAQ / Troubleshooting ── */
+    .faq-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .faq-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+    }
+
+    .faq-q {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--yellow);
+      margin-bottom: 0.5rem;
+    }
+
+    .faq-a {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
     /* ── Divider ── */
     .divider {
       border: none;
@@ -521,7 +635,6 @@
     <li><a href="#install">Install</a></li>
     <li><a href="#commands">Commands</a></li>
     <li><a href="#models">Models</a></li>
-    <li><a href="https://github.com/rohith1125/forge" target="_blank">GitHub</a></li>
     <li><a href="#install" class="nav-cta">Download</a></li>
   </ul>
 </nav>
@@ -542,7 +655,7 @@
 
   <div class="hero-actions">
     <a href="#install" class="btn btn-primary">⬇ Download Forge</a>
-    <a href="https://github.com/rohith1125/forge" target="_blank" class="btn btn-ghost">★ View on GitHub</a>
+    <a href="#features" class="btn btn-ghost">→ See features</a>
   </div>
 </section>
 
@@ -659,108 +772,253 @@
 <section id="install" class="install-section">
   <div class="container">
     <div class="section-label">// install</div>
-    <h2>Get started in 60 seconds</h2>
-    <p class="section-sub">Download the binary for your platform. No Node.js, no npm, no dependencies — just a single executable file.</p>
+    <h2>Installation guide</h2>
+    <p class="section-sub">Single binary — no Node.js, no npm, no dependencies. Download, make executable, set your API key, run.</p>
 
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('mac-arm')">macOS (Apple Silicon)</div>
-      <div class="tab" onclick="switchTab('mac-x64')">macOS (Intel)</div>
+      <div class="tab active" onclick="switchTab('mac-arm')">macOS Apple Silicon</div>
+      <div class="tab" onclick="switchTab('mac-x64')">macOS Intel</div>
       <div class="tab" onclick="switchTab('linux')">Linux</div>
-      <div class="tab" onclick="switchTab('source')">From Source</div>
     </div>
 
-    <!-- macOS ARM -->
+    <!-- ── macOS ARM ── -->
     <div class="tab-content active" id="tab-mac-arm">
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode('mac-arm-code')">copy</button>
-        <pre id="mac-arm-code"><span class="comment"># Download the binary</span>
-<span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-mac-arm64</span> \
-  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span>
 
-<span class="comment"># Make it executable</span>
-<span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+      <div class="install-steps">
 
-<span class="comment"># Set your API key</span>
-<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">your-key-here</span>
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Download the binary</div>
+            <p class="step-desc">Open Terminal and run this command to download forge and place it in <code>/usr/local/bin</code> so it's available system-wide.</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-arm-dl')">copy</button>
+              <pre id="mac-arm-dl"><span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-mac-arm64</span> \
+  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span></pre>
+            </div>
+            <p class="install-note">Don't have <code>curl</code>? Install Xcode Command Line Tools first: <code>xcode-select --install</code></p>
+          </div>
+        </div>
 
-<span class="comment"># Launch forge</span>
-<span class="cmd">forge</span></pre>
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Make it executable</div>
+            <p class="step-desc">Grant execute permission to the binary.</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-arm-chmod')">copy</button>
+              <pre id="mac-arm-chmod"><span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Bypass macOS Gatekeeper <span class="step-badge warning">macOS only</span></div>
+            <p class="step-desc">macOS blocks unsigned binaries by default. Run this once to remove the quarantine flag:</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-arm-gate')">copy</button>
+              <pre id="mac-arm-gate"><span class="cmd">xattr -d</span> <span class="arg">com.apple.quarantine</span> <span class="str">/usr/local/bin/forge</span></pre>
+            </div>
+            <p class="install-note"><strong>Alternative:</strong> If the above doesn't work, go to <strong>System Settings → Privacy &amp; Security</strong>, scroll to the bottom, and click <strong>"Allow Anyway"</strong> next to the forge warning.</p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Get an API key</div>
+            <p class="step-desc">Forge needs an API key from Anthropic (Claude) or OpenAI (GPT-4). Choose one:</p>
+            <div class="provider-cards">
+              <div class="provider-card">
+                <div class="provider-name">🟣 Anthropic (recommended)</div>
+                <p>Claude Sonnet 4 — best balance of speed and intelligence.</p>
+                <ol class="provider-steps">
+                  <li>Go to <strong>console.anthropic.com</strong></li>
+                  <li>Sign up / log in</li>
+                  <li>Click <strong>API Keys</strong> → <strong>Create Key</strong></li>
+                  <li>Copy the key starting with <code>sk-ant-...</code></li>
+                </ol>
+              </div>
+              <div class="provider-card">
+                <div class="provider-name">🟢 OpenAI</div>
+                <p>GPT-4o and variants.</p>
+                <ol class="provider-steps">
+                  <li>Go to <strong>platform.openai.com</strong></li>
+                  <li>Sign up / log in</li>
+                  <li>Click <strong>API Keys</strong> → <strong>Create new secret key</strong></li>
+                  <li>Copy the key starting with <code>sk-...</code></li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Set your API key permanently</div>
+            <p class="step-desc">Add your key to your shell profile so it's set automatically every session. Replace <code>sk-ant-YOUR-KEY</code> with your actual key.</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-arm-key')">copy</button>
+              <pre id="mac-arm-key"><span class="comment"># For Anthropic (Claude)</span>
+<span class="cmd">echo</span> <span class="str">'export ANTHROPIC_API_KEY=sk-ant-YOUR-KEY'</span> >> ~/.zshrc
+<span class="cmd">source</span> <span class="arg">~/.zshrc</span>
+
+<span class="comment"># OR for OpenAI</span>
+<span class="cmd">echo</span> <span class="str">'export OPENAI_API_KEY=sk-YOUR-KEY'</span> >> ~/.zshrc
+<span class="cmd">source</span> <span class="arg">~/.zshrc</span></pre>
+            </div>
+            <p class="install-note">Using bash instead of zsh? Replace <code>~/.zshrc</code> with <code>~/.bash_profile</code></p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Launch forge</div>
+            <p class="step-desc">Open a new terminal window (so the env var is loaded) and run:</p>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-arm-run')">copy</button>
+              <pre id="mac-arm-run"><span class="cmd">forge</span></pre>
+            </div>
+            <p class="install-note">You should see the forge UI with the ASCII logo. Type a message and press Enter to start. Type <code>/help</code> for all commands.</p>
+          </div>
+        </div>
+
       </div>
-      <p class="install-note">Requires macOS 13+ on Apple Silicon (M1/M2/M3/M4). <strong>First launch:</strong> macOS may warn about an unverified developer — go to System Preferences → Security &amp; Privacy and click "Allow Anyway".</p>
     </div>
 
-    <!-- macOS x64 -->
+    <!-- ── macOS Intel ── -->
     <div class="tab-content" id="tab-mac-x64">
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode('mac-x64-code')">copy</button>
-        <pre id="mac-x64-code"><span class="comment"># Download the binary</span>
-<span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-mac-x64</span> \
-  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span>
+      <div class="install-steps">
 
-<span class="comment"># Make it executable</span>
-<span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Download the binary</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-x64-dl')">copy</button>
+              <pre id="mac-x64-dl"><span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-mac-x64</span> \
+  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span></pre>
+            </div>
+          </div>
+        </div>
 
-<span class="comment"># Set your API key</span>
-<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">your-key-here</span>
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Make executable + bypass Gatekeeper</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-x64-setup')">copy</button>
+              <pre id="mac-x64-setup"><span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+<span class="cmd">xattr -d</span> <span class="arg">com.apple.quarantine</span> <span class="str">/usr/local/bin/forge</span></pre>
+            </div>
+          </div>
+        </div>
 
-<span class="comment"># Launch forge</span>
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Set API key + run</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('mac-x64-key')">copy</button>
+              <pre id="mac-x64-key"><span class="cmd">echo</span> <span class="str">'export ANTHROPIC_API_KEY=sk-ant-YOUR-KEY'</span> >> ~/.zshrc
+<span class="cmd">source</span> <span class="arg">~/.zshrc</span>
 <span class="cmd">forge</span></pre>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <p class="install-note">Requires macOS 13+ on Intel (x86_64).</p>
     </div>
 
-    <!-- Linux -->
+    <!-- ── Linux ── -->
     <div class="tab-content" id="tab-linux">
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode('linux-code')">copy</button>
-        <pre id="linux-code"><span class="comment"># Download the binary</span>
-<span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-linux-x64</span> \
-  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span>
+      <div class="install-steps">
 
-<span class="comment"># Make it executable</span>
-<span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Download the binary</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('linux-dl')">copy</button>
+              <pre id="linux-dl"><span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-linux-x64</span> \
+  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span></pre>
+            </div>
+            <p class="install-note">No curl? Use: <code>wget -O /usr/local/bin/forge &lt;url&gt;</code></p>
+          </div>
+        </div>
 
-<span class="comment"># Set your API key</span>
-<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">your-key-here</span>
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Make executable</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('linux-chmod')">copy</button>
+              <pre id="linux-chmod"><span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span></pre>
+            </div>
+            <p class="install-note">If you get <em>Permission denied</em>, prefix with <code>sudo</code></p>
+          </div>
+        </div>
 
-<span class="comment"># (Optional) Add to ~/.bashrc or ~/.zshrc to persist</span>
-<span class="cmd">echo</span> <span class="str">'export ANTHROPIC_API_KEY=your-key-here'</span> >> ~/.zshrc
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Set API key permanently</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('linux-key')">copy</button>
+              <pre id="linux-key"><span class="comment"># Add to your shell profile</span>
+<span class="cmd">echo</span> <span class="str">'export ANTHROPIC_API_KEY=sk-ant-YOUR-KEY'</span> >> ~/.bashrc
+<span class="cmd">source</span> <span class="arg">~/.bashrc</span>
 
-<span class="comment"># Launch forge</span>
-<span class="cmd">forge</span></pre>
+<span class="comment"># OR for OpenAI</span>
+<span class="cmd">echo</span> <span class="str">'export OPENAI_API_KEY=sk-YOUR-KEY'</span> >> ~/.bashrc
+<span class="cmd">source</span> <span class="arg">~/.bashrc</span></pre>
+            </div>
+            <p class="install-note">Using zsh? Replace <code>~/.bashrc</code> with <code>~/.zshrc</code></p>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Launch forge</div>
+            <div class="code-block">
+              <button class="copy-btn" onclick="copyCode('linux-run')">copy</button>
+              <pre id="linux-run"><span class="cmd">forge</span></pre>
+            </div>
+            <p class="install-note">Tested on Ubuntu 22.04+, Debian 12+, Arch Linux. Requires a real terminal (not a VS Code integrated terminal inside a container).</p>
+          </div>
+        </div>
+
       </div>
-      <p class="install-note">Tested on Ubuntu 22.04+, Debian 12+, Arch Linux.</p>
     </div>
 
-    <!-- Source -->
-    <div class="tab-content" id="tab-source">
-      <div class="code-block">
-        <button class="copy-btn" onclick="copyCode('source-code')">copy</button>
-        <pre id="source-code"><span class="comment"># Prerequisites: Node 20+, pnpm 9+</span>
-<span class="cmd">git clone</span> <span class="str">https://github.com/rohith1125/forge</span>
-<span class="cmd">cd</span> <span class="arg">forge</span>
-<span class="cmd">pnpm install</span>
-<span class="cmd">pnpm build</span>
-
-<span class="comment"># Run directly</span>
-<span class="cmd">node packages/cli/dist/index.js</span>
-
-<span class="comment"># Or build a local binary (requires Bun)</span>
-<span class="cmd">pnpm binary</span></pre>
+    <!-- ── Troubleshooting ── -->
+    <div style="margin-top:2.5rem;">
+      <div class="section-label" style="margin-bottom:1rem;">// troubleshooting</div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <div class="faq-q">❯ <code>forge: command not found</code></div>
+          <p class="faq-a"><code>/usr/local/bin</code> may not be in your PATH. Fix: <code>export PATH="/usr/local/bin:$PATH"</code> and add that line to your <code>~/.zshrc</code> or <code>~/.bashrc</code>. Or move the binary to <code>~/bin/forge</code> and add <code>~/bin</code> to PATH.</p>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">❯ macOS: "forge cannot be opened because the developer cannot be verified"</div>
+          <p class="faq-a">Run: <code>xattr -d com.apple.quarantine /usr/local/bin/forge</code><br/>Or: System Settings → Privacy &amp; Security → scroll down → Allow Anyway.</p>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">❯ <code>Error: ANTHROPIC_API_KEY is not set</code></div>
+          <p class="faq-a">Make sure you sourced your profile after adding the key: <code>source ~/.zshrc</code>. Or set it inline: <code>ANTHROPIC_API_KEY=sk-ant-... forge</code></p>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">❯ <code>forge: requires an interactive terminal (TTY)</code></div>
+          <p class="faq-a">Forge requires a real terminal. Don't run it via shell scripts, piped input, or non-TTY environments. Open iTerm2, Terminal.app, or any real terminal emulator.</p>
+        </div>
       </div>
     </div>
 
-    <div style="margin-top:2rem; padding:1.25rem; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
-      <div style="font-weight:600; margin-bottom:0.75rem; color:var(--text);">API Key Setup</div>
-      <p style="font-size:0.875rem; color:var(--text-dim); margin-bottom:0.75rem;">Forge works with Anthropic (Claude) and OpenAI. Set the environment variable for your chosen provider:</p>
-      <div class="code-block" style="margin:0;">
-        <pre><span class="comment"># Anthropic (Claude) — recommended</span>
-<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">sk-ant-...</span>
-
-<span class="comment"># OpenAI (GPT-4)</span>
-<span class="cmd">export</span> <span class="arg">OPENAI_API_KEY</span>=<span class="str">sk-...</span></pre>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -868,16 +1126,8 @@
 
 <!-- ── Footer ── -->
 <footer>
-  <p>
-    Built by <a href="https://github.com/rohith1125" target="_blank">rohith1125</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/rohith1125/forge" target="_blank">GitHub</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/rohith1125/forge/releases" target="_blank">Releases</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/rohith1125/forge/issues" target="_blank">Issues</a>
-  </p>
-  <p style="margin-top:0.5rem; color:#30363d;">MIT License · forge v0.1</p>
+  <p>Built by <a href="https://github.com/rohith1125" target="_blank">rohith1125</a></p>
+  <p style="margin-top:0.5rem; color:#30363d;">forge v0.1</p>
 </footer>
 
 <script>
