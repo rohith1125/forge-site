@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge — AI Coding Assistant</title>
+  <meta name="description" content="Forge is an open-source, terminal-native AI coding assistant. Think, plan, and code with your preferred LLM — right in your terminal." />
+  <meta property="og:title" content="Forge — AI Coding Assistant" />
+  <meta property="og:description" content="Open-source, terminal-native AI coding assistant powered by Claude, GPT-4, and more." />
+  <meta property="og:type" content="website" />
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2128;
+      --border: #30363d;
+      --cyan: #00d4ff;
+      --cyan-dim: #0a9fbf;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --purple: #bc8cff;
+      --red: #f85149;
+      --text: #e6edf3;
+      --text-dim: #7d8590;
+      --text-muted: #484f58;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      background: var(--cyan);
+      color: var(--bg) !important;
+      font-weight: 600;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .nav-cta:hover { opacity: 0.85; text-decoration: none !important; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 5rem 2rem 4rem;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      color: var(--cyan);
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero pre {
+      font-family: var(--font-mono);
+      font-size: clamp(0.55rem, 1.6vw, 0.85rem);
+      color: var(--cyan);
+      line-height: 1.2;
+      margin-bottom: 2rem;
+      display: inline-block;
+      text-align: left;
+      text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 span { color: var(--cyan); }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-dim);
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover { opacity: 0.85; text-decoration: none; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    /* ── Terminal demo ── */
+    .terminal-wrap {
+      max-width: 780px;
+      margin: 0 auto 5rem;
+      padding: 0 2rem;
+    }
+
+    .terminal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .terminal-bar {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .t-dim { color: var(--text-muted); }
+    .t-cyan { color: var(--cyan); }
+    .t-green { color: var(--green); }
+    .t-yellow { color: var(--yellow); }
+    .t-purple { color: var(--purple); }
+    .t-red { color: var(--red); }
+    .t-white { color: var(--text); }
+    .t-bold { font-weight: 700; }
+
+    .t-line { display: block; }
+    .t-prompt::before { content: "forge ❯ "; color: var(--cyan); font-weight: 700; }
+    .t-user::before { content: "you ❯ "; color: var(--text-muted); }
+    .t-spinner { color: var(--cyan); }
+
+    /* ── Section layout ── */
+    section { padding: 4rem 2rem; }
+    .container { max-width: 1000px; margin: 0 auto; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section-sub {
+      color: var(--text-dim);
+      font-size: 1.05rem;
+      max-width: 560px;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Features grid ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--cyan-dim);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* ── Commands table ── */
+    .commands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .cmd-row {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+
+    .cmd-name {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--cyan);
+      flex-shrink: 0;
+      min-width: 120px;
+    }
+
+    .cmd-desc {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* ── Install section ── */
+    .install-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.875rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      color: var(--text-dim);
+      user-select: none;
+      transition: color 0.15s;
+    }
+
+    .tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+
+    .tab:hover { color: var(--text); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      position: relative;
+      overflow-x: auto;
+    }
+
+    .code-block .comment { color: var(--text-muted); }
+    .code-block .cmd { color: var(--text); }
+    .code-block .arg { color: var(--cyan); }
+    .code-block .str { color: var(--green); }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.6rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover { color: var(--text); border-color: var(--cyan); }
+
+    .install-note {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .install-note strong { color: var(--text); }
+
+    /* ── Models section ── */
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .model-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .model-logo {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .model-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .model-card p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .model-tag {
+      display: inline-block;
+      margin-top: 0.5rem;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: var(--cyan);
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+    }
+
+    /* ── Themes ── */
+    .themes-grid {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .theme-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--cyan); }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Scroll fade in ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in { animation: fadeUp 0.5s ease forwards; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      section { padding: 3rem 1.25rem; }
+      .hero { padding: 3rem 1.25rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <div class="nav-logo">⚒ forge</div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#commands">Commands</a></li>
+    <li><a href="#models">Models</a></li>
+    <li><a href="https://github.com/rohith1125/forge" target="_blank">GitHub</a></li>
+    <li><a href="#install" class="nav-cta">Download</a></li>
+  </ul>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-badge">open source · terminal-native · model-agnostic</div>
+  <pre>
+  ███████╗ ██████╗ ██████╗  ██████╗ ███████╗
+  ██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝
+  █████╗  ██║   ██║██████╔╝██║  ███╗█████╗
+  ██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝
+  ██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗
+  ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre>
+
+  <h1>Your AI coding assistant,<br/><span>lives in your terminal</span></h1>
+  <p class="hero-sub">Forge is an open-source, terminal-native AI coding assistant. Think, plan, and code with Claude, GPT-4, or any LLM — without leaving your terminal.</p>
+
+  <div class="hero-actions">
+    <a href="#install" class="btn btn-primary">⬇ Download Forge</a>
+    <a href="https://github.com/rohith1125/forge" target="_blank" class="btn btn-ghost">★ View on GitHub</a>
+  </div>
+</section>
+
+<!-- ── Terminal demo ── -->
+<div class="terminal-wrap">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-red"></div>
+      <div class="dot dot-yellow"></div>
+      <div class="dot dot-green"></div>
+      <div class="terminal-title">forge — ~/myproject</div>
+    </div>
+    <div class="terminal-body">
+      <span class="t-line t-dim">╭─────────────────────────────────────────────────────────╮</span>
+      <span class="t-line"><span class="t-cyan t-bold">⚒  forge</span>  <span class="t-dim">│  anthropic/</span><span class="t-white t-bold">claude-sonnet-4</span><span class="t-dim">           Ctrl+C abort  /help</span></span>
+      <span class="t-line t-dim">╰─────────────────────────────────────────────────────────╯</span>
+      <span class="t-line">&nbsp;</span>
+      <span class="t-line"><span class="t-dim">you   ❯  </span><span class="t-white">refactor the auth module to use JWT tokens</span></span>
+      <span class="t-line">&nbsp;</span>
+      <span class="t-line"><span class="t-cyan t-bold">forge</span></span>
+      <span class="t-line t-dim">  I'll refactor the auth module to use JWT. Here's my plan:</span>
+      <span class="t-line">&nbsp;</span>
+      <span class="t-line"><span class="t-cyan">  ⠹ </span><span class="t-dim">read_file  path="src/auth/auth.ts"</span></span>
+      <span class="t-line"><span class="t-dim">  ↳ </span><span class="t-dim">// 142 lines, session-based auth...</span></span>
+      <span class="t-line"><span class="t-cyan">  ⠼ </span><span class="t-dim">edit_file  file_path="src/auth/auth.ts"</span></span>
+      <span class="t-line"><span class="t-dim">  ↳ </span><span class="t-green">✓ replaced session store with JWT sign/verify</span></span>
+      <span class="t-line"><span class="t-cyan">  ⠦ </span><span class="t-dim">edit_file  file_path="src/auth/middleware.ts"</span></span>
+      <span class="t-line"><span class="t-dim">  ↳ </span><span class="t-green">✓ updated middleware to decode Bearer token</span></span>
+      <span class="t-line">&nbsp;</span>
+      <span class="t-line"><span class="t-cyan t-bold">forge</span>  <span class="t-dim t-bold">12:34:01</span></span>
+      <span class="t-line t-dim">  Done. Replaced session-based auth with JWT across 3 files.</span>
+      <span class="t-line t-dim">  Added `jsonwebtoken` dep and updated `.env.example` with `JWT_SECRET`.</span>
+      <span class="t-line">&nbsp;</span>
+      <span class="t-line t-dim">session:a3f7c91b  msgs:4  tok:3,241  [████████░░░░░░░░░░░░]  $0.0087</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── Features ── -->
+<section id="features">
+  <div class="container">
+    <div class="section-label">// features</div>
+    <h2>Everything you need, nothing you don't</h2>
+    <p class="section-sub">Built for developers who live in the terminal. Forge is fast, keyboard-driven, and gets out of your way.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Streaming responses</h3>
+        <p>See output token-by-token as the model generates. Real-time token speed displayed while streaming. Abort anytime with Ctrl+C.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛠</div>
+        <h3>Full file system tools</h3>
+        <p>Read, write, edit files. Run shell commands. Search with glob and regex grep. Fetch URLs. Search the web. All built in, permission-gated.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Permission system</h3>
+        <p>Every tool requires explicit permission. Choose allow, deny, or always-allow per session. File writes and shell commands need your approval.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Task tracking</h3>
+        <p>Ask forge to plan multi-step work. It writes a task list visible live in the UI — updated in real time as each step completes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Plan mode</h3>
+        <p>Toggle <code>/plan</code> to make forge reason and outline steps without executing any tools. Perfect for complex tasks before committing.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💾</div>
+        <h3>Session persistence</h3>
+        <p>Every conversation is saved. Resume any previous session with <code>/resume</code>. Session title auto-set from your first message.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗜</div>
+        <h3>Context compaction</h3>
+        <p>Long conversations eating your context window? <code>/compact</code> summarizes the history into a concise snapshot without losing key context.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>8 themes</h3>
+        <p>Forge, Dracula, Tokyo Night, Amber, Matrix, Ocean, Nord, Rose Pine. Switch live with <code>/theme &lt;name&gt;</code>. Persisted across sessions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Token &amp; cost tracking</h3>
+        <p>Live token count, prompt vs completion split bar, and cost estimate shown in the status bar. See exactly what each conversation costs.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Web tools</h3>
+        <p>Forge can fetch any URL and search DuckDuckGo. Great for pulling in docs, checking APIs, or researching while coding.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⌨️</div>
+        <h3>Input history</h3>
+        <p>Navigate previous commands with ↑ / ↓. Full keyboard-driven workflow — no mouse needed. Ctrl+L clears screen instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔌</div>
+        <h3>Plugin &amp; MCP support</h3>
+        <p>Extend forge with custom tools via plugins or the Model Context Protocol. Connect any MCP server to add new capabilities.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ── Install ── -->
+<section id="install" class="install-section">
+  <div class="container">
+    <div class="section-label">// install</div>
+    <h2>Get started in 60 seconds</h2>
+    <p class="section-sub">Download the binary for your platform. No Node.js, no npm, no dependencies — just a single executable file.</p>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('mac-arm')">macOS (Apple Silicon)</div>
+      <div class="tab" onclick="switchTab('mac-x64')">macOS (Intel)</div>
+      <div class="tab" onclick="switchTab('linux')">Linux</div>
+      <div class="tab" onclick="switchTab('source')">From Source</div>
+    </div>
+
+    <!-- macOS ARM -->
+    <div class="tab-content active" id="tab-mac-arm">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('mac-arm-code')">copy</button>
+        <pre id="mac-arm-code"><span class="comment"># Download the binary</span>
+<span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-mac-arm64</span> \
+  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span>
+
+<span class="comment"># Make it executable</span>
+<span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+
+<span class="comment"># Set your API key</span>
+<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">your-key-here</span>
+
+<span class="comment"># Launch forge</span>
+<span class="cmd">forge</span></pre>
+      </div>
+      <p class="install-note">Requires macOS 13+ on Apple Silicon (M1/M2/M3/M4). <strong>First launch:</strong> macOS may warn about an unverified developer — go to System Preferences → Security &amp; Privacy and click "Allow Anyway".</p>
+    </div>
+
+    <!-- macOS x64 -->
+    <div class="tab-content" id="tab-mac-x64">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('mac-x64-code')">copy</button>
+        <pre id="mac-x64-code"><span class="comment"># Download the binary</span>
+<span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-mac-x64</span> \
+  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span>
+
+<span class="comment"># Make it executable</span>
+<span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+
+<span class="comment"># Set your API key</span>
+<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">your-key-here</span>
+
+<span class="comment"># Launch forge</span>
+<span class="cmd">forge</span></pre>
+      </div>
+      <p class="install-note">Requires macOS 13+ on Intel (x86_64).</p>
+    </div>
+
+    <!-- Linux -->
+    <div class="tab-content" id="tab-linux">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('linux-code')">copy</button>
+        <pre id="linux-code"><span class="comment"># Download the binary</span>
+<span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge/releases/latest/download/forge-linux-x64</span> \
+  <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span>
+
+<span class="comment"># Make it executable</span>
+<span class="cmd">chmod +x</span> <span class="arg">/usr/local/bin/forge</span>
+
+<span class="comment"># Set your API key</span>
+<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">your-key-here</span>
+
+<span class="comment"># (Optional) Add to ~/.bashrc or ~/.zshrc to persist</span>
+<span class="cmd">echo</span> <span class="str">'export ANTHROPIC_API_KEY=your-key-here'</span> >> ~/.zshrc
+
+<span class="comment"># Launch forge</span>
+<span class="cmd">forge</span></pre>
+      </div>
+      <p class="install-note">Tested on Ubuntu 22.04+, Debian 12+, Arch Linux.</p>
+    </div>
+
+    <!-- Source -->
+    <div class="tab-content" id="tab-source">
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode('source-code')">copy</button>
+        <pre id="source-code"><span class="comment"># Prerequisites: Node 20+, pnpm 9+</span>
+<span class="cmd">git clone</span> <span class="str">https://github.com/rohith1125/forge</span>
+<span class="cmd">cd</span> <span class="arg">forge</span>
+<span class="cmd">pnpm install</span>
+<span class="cmd">pnpm build</span>
+
+<span class="comment"># Run directly</span>
+<span class="cmd">node packages/cli/dist/index.js</span>
+
+<span class="comment"># Or build a local binary (requires Bun)</span>
+<span class="cmd">pnpm binary</span></pre>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem; padding:1.25rem; background:var(--bg); border:1px solid var(--border); border-radius:8px;">
+      <div style="font-weight:600; margin-bottom:0.75rem; color:var(--text);">API Key Setup</div>
+      <p style="font-size:0.875rem; color:var(--text-dim); margin-bottom:0.75rem;">Forge works with Anthropic (Claude) and OpenAI. Set the environment variable for your chosen provider:</p>
+      <div class="code-block" style="margin:0;">
+        <pre><span class="comment"># Anthropic (Claude) — recommended</span>
+<span class="cmd">export</span> <span class="arg">ANTHROPIC_API_KEY</span>=<span class="str">sk-ant-...</span>
+
+<span class="comment"># OpenAI (GPT-4)</span>
+<span class="cmd">export</span> <span class="arg">OPENAI_API_KEY</span>=<span class="str">sk-...</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ── Commands ── -->
+<section id="commands">
+  <div class="container">
+    <div class="section-label">// commands</div>
+    <h2>All slash commands</h2>
+    <p class="section-sub">Type any command into the forge prompt. Use <code>/help</code> to see this list inside forge.</p>
+
+    <div class="commands-grid">
+      <div class="cmd-row"><span class="cmd-name">/help</span><span class="cmd-desc">Show all available commands</span></div>
+      <div class="cmd-row"><span class="cmd-name">/plan</span><span class="cmd-desc">Toggle plan mode — reason without executing tools</span></div>
+      <div class="cmd-row"><span class="cmd-name">/compact</span><span class="cmd-desc">Summarize conversation to free up context window</span></div>
+      <div class="cmd-row"><span class="cmd-name">/clear</span><span class="cmd-desc">Clear message history (keeps session)</span></div>
+      <div class="cmd-row"><span class="cmd-name">/undo</span><span class="cmd-desc">Remove last user + assistant exchange</span></div>
+      <div class="cmd-row"><span class="cmd-name">/copy</span><span class="cmd-desc">Copy last assistant response to clipboard</span></div>
+      <div class="cmd-row"><span class="cmd-name">/theme [name]</span><span class="cmd-desc">Switch color theme or list all themes</span></div>
+      <div class="cmd-row"><span class="cmd-name">/stats</span><span class="cmd-desc">Token usage, cost, session ID, model info</span></div>
+      <div class="cmd-row"><span class="cmd-name">/resume [id]</span><span class="cmd-desc">Resume a previous saved session</span></div>
+      <div class="cmd-row"><span class="cmd-name">/model [name]</span><span class="cmd-desc">Switch AI model mid-conversation</span></div>
+      <div class="cmd-row"><span class="cmd-name">/exit</span><span class="cmd-desc">Quit forge</span></div>
+    </div>
+
+    <div style="margin-top:2rem">
+      <div class="section-label" style="margin-bottom:0.75rem;">// keyboard shortcuts</div>
+      <div class="commands-grid">
+        <div class="cmd-row"><span class="cmd-name">↑ / ↓</span><span class="cmd-desc">Navigate input history</span></div>
+        <div class="cmd-row"><span class="cmd-name">Ctrl+C</span><span class="cmd-desc">Abort streaming response / exit forge</span></div>
+        <div class="cmd-row"><span class="cmd-name">Ctrl+L</span><span class="cmd-desc">Clear screen</span></div>
+        <div class="cmd-row"><span class="cmd-name">Escape</span><span class="cmd-desc">Clear input / exit plan mode</span></div>
+        <div class="cmd-row"><span class="cmd-name">y / n / a</span><span class="cmd-desc">Allow / deny / always-allow permission prompt</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ── Models ── -->
+<section id="models">
+  <div class="container">
+    <div class="section-label">// models</div>
+    <h2>Works with your preferred LLM</h2>
+    <p class="section-sub">Forge is model-agnostic. Use Claude, GPT-4, or any OpenAI-compatible endpoint.</p>
+
+    <div class="models-grid">
+      <div class="model-card">
+        <div class="model-logo">🟣</div>
+        <h3>Claude 4</h3>
+        <p>Anthropic's most capable model family</p>
+        <span class="model-tag">recommended</span>
+      </div>
+      <div class="model-card">
+        <div class="model-logo">🟢</div>
+        <h3>GPT-4o</h3>
+        <p>OpenAI's flagship multimodal model</p>
+        <span class="model-tag">openai</span>
+      </div>
+      <div class="model-card">
+        <div class="model-logo">🔵</div>
+        <h3>GPT-4o mini</h3>
+        <p>Fast and cost-efficient for lighter tasks</p>
+        <span class="model-tag">openai</span>
+      </div>
+      <div class="model-card">
+        <div class="model-logo">⚫</div>
+        <h3>Ollama / Local</h3>
+        <p>Any OpenAI-compatible local endpoint</p>
+        <span class="model-tag">self-hosted</span>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem; padding:1.25rem; background:var(--bg2); border:1px solid var(--border); border-radius:8px; font-size:0.875rem; color:var(--text-dim);">
+      Switch models at any time with <code style="color:var(--cyan)">/model claude-opus-4-20250514</code> or <code style="color:var(--cyan)">/model gpt-4o</code>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ── Themes ── -->
+<section id="themes">
+  <div class="container">
+    <div class="section-label">// themes</div>
+    <h2>8 built-in color themes</h2>
+    <p class="section-sub">Switch live with <code>/theme &lt;name&gt;</code>. Your preference is saved automatically.</p>
+
+    <div class="themes-grid">
+      <div class="theme-chip"><div class="theme-dot" style="background:#00d4ff"></div>forge (default)</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#bd93f9"></div>dracula</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#7aa2f7"></div>tokyoNight</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#e5c07b"></div>amber</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#50fa7b"></div>matrix</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#60b2ff"></div>ocean</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#88c0d0"></div>nord</div>
+      <div class="theme-chip"><div class="theme-dot" style="background:#eb6f92"></div>rose</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ── Footer ── -->
+<footer>
+  <p>
+    Built by <a href="https://github.com/rohith1125" target="_blank">rohith1125</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/rohith1125/forge" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/rohith1125/forge/releases" target="_blank">Releases</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/rohith1125/forge/issues" target="_blank">Issues</a>
+  </p>
+  <p style="margin-top:0.5rem; color:#30363d;">MIT License · forge v0.1</p>
+</footer>
+
+<script>
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', t.getAttribute('onclick').includes(id));
+    });
+    document.querySelectorAll('.tab-content').forEach(c => {
+      c.classList.toggle('active', c.id === 'tab-' + id);
+    });
+  }
+
+  function copyCode(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.closest('.code-block').querySelector('.copy-btn');
+      btn.textContent = 'copied!';
+      setTimeout(() => btn.textContent = 'copy', 2000);
+    });
+  }
+</script>
+</body>
+</html>
