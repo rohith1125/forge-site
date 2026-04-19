@@ -700,10 +700,10 @@
 ██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝
 ██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗
 ╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝</pre>
-  <div class="hero-badge">open source · terminal-native · model-agnostic</div>
+  <div class="hero-badge">v0.6 · open source · terminal-native · model-agnostic</div>
 
   <h1>Your AI coding assistant,<br/><span>lives in your terminal</span></h1>
-  <p class="hero-sub">Forge is an open-source, terminal-native AI coding assistant. Think, plan, and code with Claude, GPT-4, or any LLM — without leaving your terminal.</p>
+  <p class="hero-sub">Forge is an open-source, terminal-native AI coding assistant. Think, plan, and build with Claude, GPT-4, or any LLM — without leaving your terminal. Single binary, no Node.js required.</p>
 
   <div class="hero-actions">
     <a href="#install" class="btn btn-primary">⬇ Download Forge</a>
@@ -826,6 +826,13 @@
     <div class="section-label">// install</div>
     <h2>Installation guide</h2>
     <p class="section-sub">Single binary — no Node.js, no npm, no dependencies. Download, make executable, set your API key, run.</p>
+
+    <!-- Quick one-liner install -->
+    <div class="code-block" style="max-width:680px;margin:0 auto 2rem;text-align:left;">
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.5rem;">macOS Apple Silicon — quick install</div>
+      <button class="copy-btn" onclick="copyCode('quick-install')">copy</button>
+      <pre id="quick-install"><span class="cmd">curl -L</span> <span class="str">https://github.com/rohith1125/forge-releases/releases/latest/download/forge-mac-arm64</span> <span class="cmd">-o</span> <span class="arg">/usr/local/bin/forge</span> <span class="cmd">&amp;&amp; chmod +x</span> <span class="arg">/usr/local/bin/forge</span> <span class="cmd">&amp;&amp; xattr -d</span> <span class="arg">com.apple.quarantine</span> <span class="str">/usr/local/bin/forge</span> <span class="cmd">&amp;&amp; forge</span></pre>
+    </div>
 
     <!-- Direct download buttons -->
     <div class="dl-grid">
@@ -1277,7 +1284,7 @@
 <!-- ── Footer ── -->
 <footer>
   <p>Built by <a href="https://github.com/rohith1125" target="_blank">rohith1125</a></p>
-  <p style="margin-top:0.5rem; color:#30363d;">forge v0.1</p>
+  <p style="margin-top:0.5rem; color:#30363d;">forge v0.6.3</p>
 </footer>
 
 <script>
